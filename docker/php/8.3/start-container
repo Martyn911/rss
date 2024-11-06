@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+#
+# Copyright (c) 2024 - All Rights Reserved
+#
+# PHP version 7 and 8
+#
+# @author    Serhii Martynenko <martyn922@gmail.com>
+# @copyright 2024 Serhii Martynenko
+# @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+#
+
+if [ ! -d /.composer ]; then
+    mkdir /.composer
+fi
+
+chmod -R ugo+rw /.composer
+
+composer install
+npm install && npm run build
+
+php artisan storage:link
+php artisan migrate --force
+php artisan config:cache
+php artisan view:cache
+php artisan rss:parse-feeds-file
+php artisan rss:update-outdated-feeds
+
+# Set runtime permissions
+chown -R $SUPERVISOR_PHP_USER:$SUPERVISOR_PHP_USER /var/www/html/storage
+
+if [ $# -gt 0 ]; then
+    if [ "$SUPERVISOR_PHP_USER" = "root" ]; then
+        exec "$@"
+    else
+        exec gosu $SUPERVISOR_PHP_USER "$@"
+    fi
+else
+    exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+fi

@@ -1,0 +1,4 @@
+https://www.nydailynews.com/feed/ feed-1 #news
+http://feeds.feedburner.com/samfirm feed-2 #tag-a #tag-b
+https://www.pravda.com.ua/rus/rss/view_news/ feed-3 #ukraine #glory-ukraine
+https://feed.4in.top/rss.xml feed-4 #google #trends
